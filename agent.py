@@ -291,7 +291,7 @@ async def _execute_tool(tool_name: str, tool_args: dict) -> str:
 # Provider 1 — Groq
 # ===========================================================================
 
-async def _run_groq_loop(messages: list[dict]) -> str:
+async def _run_groq_loop(messages: list[dict],callback=None) -> str:
     """
     Run the full tool-calling loop using Groq.
 
@@ -344,10 +344,17 @@ async def _run_groq_loop(messages: list[dict]) -> str:
 
         # Execute each tool call and add results to history
         for tc in msg.tool_calls:
+            if callback:
+                await callback({"type": "tool_call", "tool": tc.function.name})
+
             tool_result = await _execute_tool(
                 tc.function.name,
                 json.loads(tc.function.arguments),
             )
+
+            if callback:
+                await callback({"type": "tool_done", "tool": tc.function.name})
+
             messages.append({
                 "role":         "tool",
                 "tool_call_id": tc.id,
@@ -361,7 +368,7 @@ async def _run_groq_loop(messages: list[dict]) -> str:
 # Provider 2 — Ollama (fallback)
 # ===========================================================================
 
-async def _run_ollama_loop(messages: list[dict]) -> str:
+async def _run_ollama_loop(messages: list[dict],callback=None) -> str:
     """
     Run the full tool-calling loop using Ollama (qwen2.5:14b).
     Used as fallback when Groq is rate-limited.
@@ -406,7 +413,13 @@ async def _run_ollama_loop(messages: list[dict]) -> str:
                 fn   = tc["function"]
                 args = json.loads(fn["arguments"]) if isinstance(fn["arguments"], str) else fn["arguments"]
 
+                if callback:
+                    await callback({"type": "tool_call", "tool": fn["name"]})
+
                 tool_result = await _execute_tool(fn["name"], args)
+
+                if callback:
+                    await callback({"type": "tool_done", "tool": fn["name"]})
 
                 messages.append({
                     "role":         "tool",
@@ -421,14 +434,14 @@ async def _run_ollama_loop(messages: list[dict]) -> str:
 # Public interface — run_query
 # ===========================================================================
 
-async def run_query(query: str) -> dict:
+async def run_query(query: str,callback=None) -> dict:
     """
     Main entry point. Accepts a natural language financial query,
     runs the tool-calling loop, returns a structured result.
 
     Args:
         query: natural language question e.g.
-               "What is the Sharpe ratio of AAPL and MSFT over the last year?"
+            "What is the Sharpe ratio of AAPL and MSFT over the last year?"
 
     Returns:
         dict:
@@ -458,7 +471,7 @@ async def run_query(query: str) -> dict:
 
     try:
         # --- Try Groq first ---
-        answer   = await _run_groq_loop(messages)
+        answer   = await _run_groq_loop(messages,callback=callback)
         provider = "groq"
         logger.info("[agent] Completed via Groq")
 
@@ -466,14 +479,14 @@ async def run_query(query: str) -> dict:
         # --- Groq rate limit hit → fallback to Ollama ---
         logger.warning("[agent] Groq rate limit hit — falling back to Ollama. Error: %s", e)
         provider = "ollama"
-        answer   = await _run_ollama_loop(messages)
+        answer   = await _run_ollama_loop(messages,callback=callback)
         logger.info("[agent] Completed via Ollama (fallback)")
 
     except APIStatusError as e:
         # --- Other Groq API error → also fallback ---
         logger.warning("[agent] Groq API error (%s) — falling back to Ollama", e.status_code)
         provider = "ollama"
-        answer   = await _run_ollama_loop(messages)
+        answer   = await _run_ollama_loop(messages,callback=callback)
 
     except Exception as e:
         logger.error("[agent] Unexpected error: %s", e)
