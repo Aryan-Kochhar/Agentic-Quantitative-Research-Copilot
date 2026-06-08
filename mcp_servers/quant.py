@@ -21,14 +21,13 @@ from mcp.server.fastmcp import FastMCP
 from mcp_servers.market_data import _get_multi_ticker_closes, _compute_log_returns
 from quant.analysis import max_drawdown, var_95, correlation_matrix, portfolio_summary
 
+from quant.backtest import Backtester
+
 logger = logging.getLogger(__name__)
 
 mcp = FastMCP("quant")
 
 
-# ---------------------------------------------------------------------------
-# Shared helper
-# ---------------------------------------------------------------------------
 
 async def _get_returns(tickers: list[str], start_date: str, end_date: str):
     start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
@@ -36,11 +35,6 @@ async def _get_returns(tickers: list[str], start_date: str, end_date: str):
     closes  = await _get_multi_ticker_closes(tickers, start, end)
     returns = _compute_log_returns(closes)
     return returns
-
-
-# ---------------------------------------------------------------------------
-# Tools
-# ---------------------------------------------------------------------------
 
 @mcp.tool()
 async def get_max_drawdown(
@@ -145,4 +139,47 @@ async def get_portfolio_summary(
         return {"status": "ok", "data": result}
     except Exception as e:
         logger.error("[get_portfolio_summary] %s", e)
+        return {"status": "error", "message": str(e)}
+    
+@mcp.tool()
+async def run_backtest(
+    tickers: list[str],
+    start_date: str,
+    end_date: str,
+    risk_free_rate: float = 0.0,
+) -> dict:
+    """
+    Run a vectorised equal-weight backtest over a date range.
+
+    Takes close prices (not returns) — Backtester handles log return
+    computation internally via compute_log_returns().
+
+    Args:
+        tickers:        e.g. ["AAPL", "MSFT"]
+        start_date:     "YYYY-MM-DD"
+        end_date:       "YYYY-MM-DD"
+        risk_free_rate: annual risk-free rate for Sharpe (default 0.0)
+
+    Returns:
+        metrics dict + equity_curve list of {date, value} dicts.
+    """
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        end   = datetime.strptime(end_date,   "%Y-%m-%d").replace(tzinfo=timezone.utc)
+
+        # Backtester needs close prices, not log returns
+        # _get_multi_ticker_closes handles cache + yfinance fallback
+        closes = await _get_multi_ticker_closes(tickers, start, end)
+
+        bt     = Backtester()
+        result = bt.run(closes, risk_free_rate=risk_free_rate)  
+        metrics = result["metrics"]
+
+        return {
+            "status": "ok",
+            "data"  : metrics
+        }
+
+    except Exception as e:
+        logger.error("[run_backtest] %s", e)
         return {"status": "error", "message": str(e)}

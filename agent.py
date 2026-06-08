@@ -40,6 +40,7 @@ from mcp_servers.quant import (
     get_var_95,
     get_correlation_matrix,
     get_portfolio_summary,
+    run_backtest,
 )
 
 load_dotenv()
@@ -207,6 +208,28 @@ TOOLS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_backtest",
+            "description": (
+                "Run a full equal-weight portfolio backtest. Returns cumulative return, "
+                "annualized return, volatility, Sharpe ratio, max drawdown, and a daily "
+                "equity curve. Use when the user asks about portfolio performance, "
+                "backtesting, or historical simulation."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "tickers":        {"type": "array", "items": {"type": "string"}},
+                    "start_date":     {"type": "string", "description": "YYYY-MM-DD"},
+                    "end_date":       {"type": "string", "description": "YYYY-MM-DD"},
+                    "risk_free_rate": {"type": "number", "description": "Annual risk-free rate, default 0.0"},
+                },
+                "required": ["tickers", "start_date", "end_date"],
+            },
+        },
+    },
 ]
 
 
@@ -273,6 +296,9 @@ async def _execute_tool(tool_name: str, tool_args: dict) -> str:
             
         elif tool_name == "get_portfolio_summary":
             result = await get_portfolio_summary(**tool_args)
+            
+        elif tool_name == "run_backtest":
+            result = await run_backtest(**tool_args)
 
         else:
             result = {"status": "error", "message": f"Unknown tool: {tool_name}"}
@@ -534,6 +560,7 @@ async def _run_local_test():
     queries = [
         "What is the annualised volatility of AAPL over the last 6 months?",
         "Compare the Sharpe ratio of AAPL and MSFT over the last year.",
+        "Backtest an equal weight portfolio of AAPL and MSFT over the last year.",
     ]
 
     for i, query in enumerate(queries, start=2):
