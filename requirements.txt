@@ -48,3 +48,5 @@ pydantic==2.11.5        # Request/response validation (FastAPI uses this interna
 pytest==8.3.5           # Test runner
 pytest-asyncio==0.26.0  # Async test support (for testing motor, agent)
 httpx==0.28.1           # Test FastAPI endpoints (replaces requests in async tests)
+
+slowapi==0.1.9
