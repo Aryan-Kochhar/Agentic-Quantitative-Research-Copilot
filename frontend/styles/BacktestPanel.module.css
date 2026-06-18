@@ -1,0 +1,162 @@
+/* styles/BacktestPanel.module.css */
+/* Matches the existing dark terminal design system */
+
+.card {
+  background: #161929;
+  border: 0.5px solid #252840;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #BA7517;
+}
+
+/* ── Mode toggle ── */
+.toggle {
+  display: flex;
+  gap: 0;
+  border: 0.5px solid #252840;
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.tab {
+  padding: 6px 18px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #6B7094;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab:hover {
+  color: #E8EAF0;
+}
+
+.tab.active {
+  background: #252840;
+  color: #EF9F27;
+}
+
+/* ── Demo preview ── */
+.demoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.demoTickers {
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #E8EAF0;
+  letter-spacing: 0.04em;
+}
+
+.demoDates {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #6B7094;
+}
+
+/* ── Custom fields ── */
+.customFields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fieldLabel {
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #6B7094;
+}
+
+.dateRow {
+  display: flex;
+  gap: 10px;
+}
+
+.dateRow .field {
+  flex: 1;
+}
+
+.input {
+  padding: 8px 12px;
+  background: #0D0F18;
+  border: 0.5px solid #252840;
+  border-radius: 8px;
+  color: #E8EAF0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  color-scheme: dark;
+}
+
+.input:focus {
+  border-color: #BA7517;
+}
+
+.input::placeholder {
+  color: #6B7094;
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Error ── */
+.error {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #E24B4A;
+}
+
+/* ── Run button ── */
+.button {
+  padding: 10px 20px;
+  background: #BA7517;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  align-self: flex-start;
+  transition: opacity 0.2s;
+}
+
+.button:hover {
+  opacity: 0.85;
+}
+
+.button:disabled {
+  background: #252840;
+  color: #6B7094;
+  cursor: not-allowed;
+  opacity: 1;
+}

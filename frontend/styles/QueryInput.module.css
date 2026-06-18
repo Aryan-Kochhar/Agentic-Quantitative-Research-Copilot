@@ -1,0 +1,65 @@
+.card {
+  background: #161929;
+  border: 0.5px solid #252840;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #BA7517;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 14px;
+  background: #0D0F18;
+  border: 0.5px solid #252840;
+  border-radius: 8px;
+  color: #E8EAF0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #BA7517;
+}
+
+.input::placeholder {
+  color: #6B7094;
+}
+
+.button {
+  padding: 10px 20px;
+  background: #BA7517;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.button:hover {
+  opacity: 0.85;
+}
+
+.button:disabled {
+  background: #252840;
+  color: #6B7094;
+  cursor: not-allowed;
+}

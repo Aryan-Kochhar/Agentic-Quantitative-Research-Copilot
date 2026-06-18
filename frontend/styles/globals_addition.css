@@ -1,0 +1,25 @@
+/*
+ * Add these to your existing globals.css (or _app.css)
+ * These set the black base and import JetBrains Mono from Google Fonts.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+html, body {
+  background: #000000;
+  color: #E8EAF0;
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Thin custom scrollbar */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #252840; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #BA7517; }
+
+/* Smooth page transitions */
+* { box-sizing: border-box; }
+a { text-decoration: none; }

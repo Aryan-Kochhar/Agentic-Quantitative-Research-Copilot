@@ -1,0 +1,122 @@
+.card {
+  background: #161929;
+  border: 0.5px solid #252840;
+  border-radius: 12px;
+  padding: 20px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #BA7517;
+}
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1D9E75;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.thinkingText {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #6B7094;
+}
+
+.feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feed::-webkit-scrollbar {
+  width: 3px;
+}
+
+.feed::-webkit-scrollbar-thumb {
+  background: #252840;
+  border-radius: 2px;
+}
+
+.empty {
+  color: #6B7094;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.event {
+  padding: 10px 12px;
+  border-left: 3px solid;
+  background: #0D0F18;
+}
+
+.eventType {
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.eventContent {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #6B7094;
+  line-height: 1.5;
+}
+
+.tool_call {
+  border-color: #EF9F27;
+}
+
+.tool_call .eventType {
+  color: #EF9F27;
+}
+
+.tool_done {
+  border-color: #1D9E75;
+}
+
+.tool_done .eventType {
+  color: #1D9E75;
+}
+
+.answer {
+  border-color: #378ADD;
+}
+
+.answer .eventType {
+  color: #378ADD;
+}
+
+.answer .eventContent {
+  color: #E8EAF0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}

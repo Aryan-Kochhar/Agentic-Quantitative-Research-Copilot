@@ -1,0 +1,25 @@
+.card {
+  background: #161929;
+  border: 0.5px solid #252840;
+  border-radius: 12px;
+  padding: 20px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  color: #BA7517;
+  margin-bottom: 16px;
+}
+
+.empty {
+  color: #6B7094;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  margin-top: 40px;
+}
