@@ -14,7 +14,7 @@ Indexes (created at startup):
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 import numpy as np
@@ -234,8 +234,12 @@ async def ticker_exists(
     """
     Cache-hit check — does MongoDB already have this ticker for the full range?
 
-    Counts distinct dates in [start, end] and compares to expected trading days.
-    Uses a 10% tolerance for market holidays / weekends.
+    Two checks now:
+        1. Boundary check — does the earliest cached doc reach back to (or before)
+           `start`? Prevents silently using a later cached start date as if it
+           were the requested one (e.g. cache starts Aug 14, request starts Aug 7).
+        2. Count check — enough documents in [start, end] vs expected trading days,
+           10% tolerance for market holidays / weekends.
 
     Args:
         ticker: e.g. "AAPL"
@@ -250,11 +254,37 @@ async def ticker_exists(
     db = get_db()
     collection = db[COLLECTION]
 
+    start_utc = start.replace(tzinfo=timezone.utc)
+    end_utc = end.replace(tzinfo=timezone.utc)
+
+    # --- Boundary check: does cache actually reach back to `start`? ---
+    earliest_doc = await collection.find_one(
+        {"ticker": ticker},
+        sort=[("date", ASCENDING)],
+    )
+
+    if earliest_doc is None:
+        return False
+
+    earliest_cached_date = earliest_doc["date"]
+    if earliest_cached_date.tzinfo is None:
+        earliest_cached_date = earliest_cached_date.replace(tzinfo=timezone.utc)
+
+    # Allow a small buffer (3 days) for weekends/holidays right at the boundary
+    if earliest_cached_date > start_utc + timedelta(days=3):
+        logger.info(
+            "[ticker_exists] %s: cache starts %s, requested start %s — "
+            "boundary gap too large, forcing re-fetch",
+            ticker, earliest_cached_date.date(), start_utc.date(),
+        )
+        return False
+
+    # --- Count check (existing logic) ---
     count = await collection.count_documents({
         "ticker": ticker,
         "date": {
-            "$gte": start.replace(tzinfo=timezone.utc),
-            "$lte": end.replace(tzinfo=timezone.utc),
+            "$gte": start_utc,
+            "$lte": end_utc,
         },
     })
 
